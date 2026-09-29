@@ -14,10 +14,10 @@
 body{
     margin:0;
     min-height:100vh;
-    font-family:Arial, sans-serif;
+    font-family:Arial,sans-serif;
     background:
-      radial-gradient(circle at 10% 20%, #ffffff 0 3px, transparent 4px),
-      radial-gradient(circle at 90% 30%, #ffffff 0 2px, transparent 3px),
+      radial-gradient(circle at 10% 20%,#ffffff 0 3px,transparent 4px),
+      radial-gradient(circle at 90% 30%,#ffffff 0 2px,transparent 3px),
       linear-gradient(135deg,#ffd8e8,#fff3f8,#ffc5dd);
     color:#54243a;
     display:flex;
@@ -85,6 +85,11 @@ button{
     box-shadow:0 8px 20px rgba(232,62,140,.3);
 }
 
+.primary:disabled{
+    opacity:.65;
+    cursor:not-allowed;
+}
+
 .secondary{
     background:#f5dce7;
     color:#71364f;
@@ -103,8 +108,6 @@ button{
     transition:.15s;
 }
 
-/* Form */
-
 label{
     display:block;
     text-align:left;
@@ -112,7 +115,7 @@ label{
     margin:14px 0 6px;
 }
 
-input,select{
+input,textarea{
     width:100%;
     padding:13px;
     border:2px solid #f1bfd4;
@@ -120,9 +123,13 @@ input,select{
     background:#fff9fc;
     font-size:15px;
     color:#54243a;
+    font-family:Arial,sans-serif;
 }
 
-/* Locations */
+textarea{
+    min-height:105px;
+    resize:vertical;
+}
 
 .location-grid{
     display:grid;
@@ -159,8 +166,6 @@ input,select{
     font-size:13px;
 }
 
-/* Food */
-
 .food-grid{
     display:grid;
     grid-template-columns:1fr 1fr;
@@ -192,8 +197,6 @@ input,select{
     margin-bottom:5px;
 }
 
-/* Letter */
-
 .letter{
     background:#fff8fb;
     border:1px solid #f4c8d9;
@@ -213,7 +216,39 @@ input,select{
     font-weight:bold;
 }
 
-/* Doodles */
+.suggestion-box{
+    margin-top:20px;
+    padding:18px;
+    border-radius:22px;
+    background:linear-gradient(135deg,#fff0f7,#fff8fb);
+    border:2px dashed #f1b8d0;
+    animation:softFloat 2.5s ease-in-out infinite;
+}
+
+.suggestion-title{
+    font-weight:bold;
+    color:#d63384;
+    font-size:17px;
+    margin-bottom:7px;
+}
+
+.suggestion-subtitle{
+    font-size:12px;
+    color:#9b7082;
+    margin-bottom:10px;
+}
+
+.counter{
+    text-align:right;
+    font-size:11px;
+    color:#a76580;
+    margin-top:5px;
+}
+
+@keyframes softFloat{
+    0%,100%{transform:translateY(0)}
+    50%{transform:translateY(-3px)}
+}
 
 .doodle{
     position:fixed;
@@ -243,6 +278,34 @@ input,select{
 .small{
     font-size:12px;
     color:#9b7082;
+}
+
+.success-note{
+    background:#fff1f7;
+    padding:14px;
+    border-radius:18px;
+    margin-top:18px;
+    color:#71364f;
+    font-size:14px;
+}
+
+@media(max-width:420px){
+    .card{
+        padding:25px 16px;
+    }
+
+    h1{
+        font-size:25px;
+    }
+
+    .hero{
+        font-size:55px;
+    }
+
+    .location-grid,
+    .food-grid{
+        gap:7px;
+    }
 }
 </style>
 </head>
@@ -520,11 +583,39 @@ nothing... I'm counting that as a successful date. 😂💗
 
 </div>
 
+<div class="suggestion-box">
+
+<div class="suggestion-title">
+💌 One Last Little Thing...
+</div>
+
+<div class="suggestion-subtitle">
+Anything you want to add to our date plan? A place, food,
+idea, request, or just a random thought. 👀💕
+</div>
+
+<textarea
+id="finalSuggestion"
+maxlength="300"
+placeholder="Write something cute... or chaotic 😂💗"
+oninput="updateCounter()"></textarea>
+
+<div class="counter">
+<span id="charCount">0</span>/300
+</div>
+
+</div>
+
 <br>
 
-<button class="primary" onclick="submitDate()">
+<button
+id="submitBtn"
+class="primary"
+onclick="submitDate()">
 SUBMIT OUR PLAN 💌
 </button>
+
+<p id="submitStatus" class="small"></p>
 
 </div>
 
@@ -543,6 +634,12 @@ Okay, it's officially happening. 😭
 
 <div class="description" id="finalSummary"></div>
 
+<div class="success-note">
+💌 Your little plan has been saved successfully.
+<br>
+Now all that's left is showing up. 😌💗
+</div>
+
 <p>
 Glad you're coming along. 💗
 </p>
@@ -552,7 +649,7 @@ Glad you're coming along. 💗
 </div>
 
 <p class="small">
-Now all that's left is showing up. 😌
+See you soon. 🌷
 </p>
 
 </div>
@@ -561,6 +658,14 @@ Now all that's left is showing up. 😌
 
 
 <script>
+
+/* ================================
+   FORMSPREE CONNECTION
+================================ */
+
+const FORMSPREE_ENDPOINT =
+"https://formspree.io/f/mvkglawv";
+
 
 /* DATA */
 
@@ -628,10 +733,17 @@ const locationDescriptions = {
 function showScreen(id){
 
     document.querySelectorAll(".screen")
-        .forEach(screen => screen.classList.remove("active"));
+        .forEach(screen =>
+            screen.classList.remove("active")
+        );
 
     document.getElementById(id)
         .classList.add("active");
+
+    window.scrollTo({
+        top:0,
+        behavior:"smooth"
+    });
 
 }
 
@@ -641,8 +753,8 @@ function showScreen(id){
 function yesClicked(){
 
     createDoodles(
-        window.innerWidth / 2,
-        window.innerHeight / 2
+        window.innerWidth/2,
+        window.innerHeight/2
     );
 
     setTimeout(() => {
@@ -654,31 +766,42 @@ function yesClicked(){
 
 /* RUNNING NO */
 
-const noBtn = document.getElementById("noBtn");
-const buttons = document.querySelector(".buttons");
+const noBtn =
+document.getElementById("noBtn");
+
+const buttons =
+document.querySelector(".buttons");
 
 function escapeNo(){
 
     const maxX =
-        buttons.clientWidth - noBtn.offsetWidth;
+        buttons.clientWidth -
+        noBtn.offsetWidth;
 
     const maxY =
-        buttons.clientHeight - noBtn.offsetHeight;
+        buttons.clientHeight -
+        noBtn.offsetHeight;
 
     noBtn.style.left =
-        Math.max(0,Math.random()*maxX) + "px";
+        Math.max(0,Math.random()*maxX)+"px";
 
     noBtn.style.top =
-        Math.max(0,Math.random()*maxY) + "px";
+        Math.max(0,Math.random()*maxY)+"px";
 
 }
 
-noBtn.addEventListener("mouseenter",escapeNo);
+noBtn.addEventListener(
+    "mouseenter",
+    escapeNo
+);
 
-noBtn.addEventListener("touchstart",function(e){
-    e.preventDefault();
-    escapeNo();
-});
+noBtn.addEventListener(
+    "touchstart",
+    function(e){
+        e.preventDefault();
+        escapeNo();
+    }
+);
 
 
 /* LOCATION */
@@ -686,14 +809,17 @@ noBtn.addEventListener("touchstart",function(e){
 function selectLocation(element,name){
 
     document.querySelectorAll(".location")
-        .forEach(x => x.classList.remove("selected"));
+        .forEach(x =>
+            x.classList.remove("selected")
+        );
 
     element.classList.add("selected");
 
     selectedLocation = name;
 
-    document.getElementById("locationDescription")
-        .innerText =
+    document.getElementById(
+        "locationDescription"
+    ).innerText =
         locationDescriptions[name];
 
 }
@@ -708,7 +834,9 @@ function toggleFood(element,name){
     if(selectedFoods.includes(name)){
 
         selectedFoods =
-            selectedFoods.filter(food => food !== name);
+            selectedFoods.filter(
+                food => food !== name
+            );
 
     }else{
 
@@ -731,14 +859,18 @@ function goFood(){
 
     if(!date || !time){
 
-        alert("Pick a date and time first 🥹💗");
+        alert(
+            "Pick a date and time first 🥹💗"
+        );
 
         return;
     }
 
     if(!selectedLocation){
 
-        alert("You forgot to choose where we're going 😭");
+        alert(
+            "You forgot to choose where we're going 😭"
+        );
 
         return;
     }
@@ -754,7 +886,9 @@ function goLetter(){
 
     if(selectedFoods.length === 0){
 
-        alert("At least choose one food 😂🍽️");
+        alert(
+            "At least choose one food 😂🍽️"
+        );
 
         return;
 
@@ -774,9 +908,40 @@ function goLetter(){
 }
 
 
-/* SUBMIT */
+/* CHARACTER COUNTER */
 
-function submitDate(){
+function updateCounter(){
+
+    const text =
+        document.getElementById(
+            "finalSuggestion"
+        ).value;
+
+    document.getElementById(
+        "charCount"
+    ).innerText =
+        text.length;
+
+}
+
+
+/* ESCAPE HTML */
+
+function escapeHTML(value){
+
+    return String(value)
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+
+}
+
+
+/* SUBMIT TO FORMSPREE */
+
+async function submitDate(){
 
     const date =
         document.getElementById("date").value;
@@ -784,41 +949,176 @@ function submitDate(){
     const time =
         document.getElementById("time").value;
 
+    const suggestion =
+        document.getElementById(
+            "finalSuggestion"
+        ).value.trim();
+
+    if(!date || !time || !selectedLocation){
+
+        alert(
+            "Please complete the date, time and place first 🥹💗"
+        );
+
+        return;
+    }
+
+    if(selectedFoods.length === 0){
+
+        alert(
+            "Please choose at least one food 😂🍽️"
+        );
+
+        return;
+    }
+
+
     const readableDate =
         new Date(date+"T00:00:00")
-        .toLocaleDateString("en-IN",{
-            weekday:"long",
-            day:"numeric",
-            month:"long",
-            year:"numeric"
-        });
+        .toLocaleDateString(
+            "en-IN",
+            {
+                weekday:"long",
+                day:"numeric",
+                month:"long",
+                year:"numeric"
+            }
+        );
 
-    document.getElementById("finalSummary")
-        .innerHTML =
 
-        `
-        📅 <b>${readableDate}</b><br><br>
+    const submitButton =
+        document.getElementById(
+            "submitBtn"
+        );
 
-        ⏰ <b>${time}</b><br><br>
+    const status =
+        document.getElementById(
+            "submitStatus"
+        );
 
-        📍 <b>${selectedLocation}</b><br><br>
 
-        🍽️ <b>${selectedFoods.join(", ")}</b>
+    submitButton.disabled = true;
+
+    submitButton.innerText =
+        "SENDING OUR PLAN 💌...";
+
+    status.innerText =
+        "Just a tiny second... 🥹💗";
+
+
+    const formData =
+        new FormData();
+
+    formData.append(
+        "date",
+        readableDate
+    );
+
+    formData.append(
+        "time",
+        time
+    );
+
+    formData.append(
+        "location",
+        selectedLocation
+    );
+
+    formData.append(
+        "food",
+        selectedFoods.join(", ")
+    );
+
+    formData.append(
+        "suggestion",
+        suggestion ||
+        "No extra suggestion."
+    );
+
+
+    try{
+
+        const response =
+            await fetch(
+                FORMSPREE_ENDPOINT,
+                {
+                    method:"POST",
+                    headers:{
+                        "Accept":
+                        "application/json"
+                    },
+                    body:formData
+                }
+            );
+
+
+        if(!response.ok){
+
+            throw new Error(
+                "Formspree submission failed."
+            );
+
+        }
+
+
+        document.getElementById(
+            "finalSummary"
+        ).innerHTML = `
+
+        📅 <b>${escapeHTML(
+            readableDate
+        )}</b><br><br>
+
+        ⏰ <b>${escapeHTML(
+            time
+        )}</b><br><br>
+
+        📍 <b>${escapeHTML(
+            selectedLocation
+        )}</b><br><br>
+
+        🍽️ <b>${escapeHTML(
+            selectedFoods.join(", ")
+        )}</b>
+
+        ${
+            suggestion
+            ?
+            `<br><br>💌 <b>Her note:</b><br>
+            ${escapeHTML(suggestion)}`
+            :
+            ""
+        }
+
         `;
 
-    /*
-      IMPORTANT:
-      This currently displays the result locally.
-      To SEND the result to you, connect this function
-      to Formspree / Google Forms / your own backend.
-    */
 
-    showScreen("success");
+        showScreen("success");
 
-    createDoodles(
-        window.innerWidth/2,
-        window.innerHeight/2
-    );
+
+        createDoodles(
+            window.innerWidth/2,
+            window.innerHeight/2
+        );
+
+
+    }catch(error){
+
+        console.error(error);
+
+        status.innerText =
+            "Something went wrong. Please try again. 🥺";
+
+        alert(
+            "The plan couldn't be sent right now. Please try again. 💗"
+        );
+
+        submitButton.disabled = false;
+
+        submitButton.innerText =
+            "SUBMIT OUR PLAN 💌";
+
+    }
 
 }
 
@@ -827,7 +1127,7 @@ function submitDate(){
 
 function createDoodles(x,y){
 
-    const emojis=[
+    const emojis = [
         "💗","💕","💖","🌸","🎀",
         "✨","🥹","🫶🏻","🌷",
         "💐","🦋","⭐","💌"
@@ -838,7 +1138,8 @@ function createDoodles(x,y){
         const d =
             document.createElement("div");
 
-        d.className="doodle";
+        d.className =
+            "doodle";
 
         d.innerText =
             emojis[
@@ -858,8 +1159,10 @@ function createDoodles(x,y){
 
         document.body.appendChild(d);
 
-        setTimeout(()=>{
+        setTimeout(() => {
+
             d.remove();
+
         },3000);
 
     }
