@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>A Little Date Plan 💗</title>
+
+<style>
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    min-height:100vh;
+    font-family:Arial, sans-serif;
+    background:
+      radial-gradient(circle at 10% 20%, #ffffff 0 3px, transparent 4px),
+      radial-gradient(circle at 90% 30%, #ffffff 0 2px, transparent 3px),
+      linear-gradient(135deg,#ffd8e8,#fff3f8,#ffc5dd);
+    color:#54243a;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+
+.card{
+    width:100%;
+    max-width:540px;
+    background:rgba(255,255,255,.96);
+    border-radius:30px;
+    padding:30px 22px;
+    box-shadow:0 20px 60px rgba(170,40,100,.2);
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+}
+
+.screen{
+    display:none;
+}
+
+.screen.active{
+    display:block;
+}
+
+.hero{
+    font-size:64px;
+    animation:heartbeat 1.5s infinite;
+}
+
+@keyframes heartbeat{
+    0%,100%{transform:scale(1)}
+    50%{transform:scale(1.12)}
+}
+
+h1{
+    color:#d63384;
+    font-size:29px;
+    margin:10px 0;
+}
+
+h2{
+    color:#d63384;
+}
+
+p{
+    line-height:1.6;
+}
+
+button{
+    border:0;
+    border-radius:50px;
+    padding:14px 28px;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.primary{
+    background:#e83e8c;
+    color:white;
+    box-shadow:0 8px 20px rgba(232,62,140,.3);
+}
+
+.secondary{
+    background:#f5dce7;
+    color:#71364f;
+}
+
+.buttons{
+    position:relative;
+    height:110px;
+    margin-top:25px;
+}
+
+#noBtn{
+    position:absolute;
+    left:58%;
+    top:10px;
+    transition:.15s;
+}
+
+/* Form */
+
+label{
+    display:block;
+    text-align:left;
+    font-weight:bold;
+    margin:14px 0 6px;
+}
+
+input,select{
+    width:100%;
+    padding:13px;
+    border:2px solid #f1bfd4;
+    border-radius:14px;
+    background:#fff9fc;
+    font-size:15px;
+    color:#54243a;
+}
+
+/* Locations */
+
+.location-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:9px;
+    margin-top:10px;
+}
+
+.location{
+    padding:12px 7px;
+    border:2px solid #f2c5d8;
+    border-radius:16px;
+    background:#fff7fb;
+    cursor:pointer;
+    transition:.2s;
+    font-size:13px;
+}
+
+.location:hover{
+    transform:translateY(-2px);
+}
+
+.location.selected{
+    background:#ffd4e6;
+    border-color:#e83e8c;
+    box-shadow:0 5px 15px rgba(232,62,140,.18);
+}
+
+.description{
+    background:#fff1f7;
+    padding:13px;
+    border-radius:15px;
+    margin:12px 0;
+    font-size:13px;
+}
+
+/* Food */
+
+.food-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-top:15px;
+}
+
+.food{
+    padding:15px 8px;
+    border-radius:18px;
+    border:2px solid #f2c5d8;
+    background:#fff8fb;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.food:hover{
+    transform:translateY(-2px);
+}
+
+.food.selected{
+    background:#ffd3e5;
+    border-color:#e83e8c;
+}
+
+.food-icon{
+    font-size:28px;
+    display:block;
+    margin-bottom:5px;
+}
+
+/* Letter */
+
+.letter{
+    background:#fff8fb;
+    border:1px solid #f4c8d9;
+    border-radius:22px;
+    padding:25px 20px;
+    text-align:left;
+    box-shadow:inset 0 0 25px rgba(230,80,130,.05);
+}
+
+.letter p{
+    font-size:15px;
+}
+
+.signature{
+    text-align:right;
+    color:#d63384;
+    font-weight:bold;
+}
+
+/* Doodles */
+
+.doodle{
+    position:fixed;
+    pointer-events:none;
+    z-index:100;
+    font-size:28px;
+    animation:floatUp 2.5s ease-out forwards;
+}
+
+@keyframes floatUp{
+    0%{
+        opacity:1;
+        transform:translateY(0) scale(.7) rotate(0);
+    }
+    100%{
+        opacity:0;
+        transform:translateY(-280px) scale(1.4) rotate(40deg);
+    }
+}
+
+.progress{
+    font-size:12px;
+    color:#a76580;
+    margin-bottom:12px;
+}
+
+.small{
+    font-size:12px;
+    color:#9b7082;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<!-- STEP 1 -->
+
+<div id="step1" class="screen active">
+
+<div class="hero">💗</div>
+
+<h1>Okay... One Important Question 👀</h1>
+
+<p>
+Would you like to go on a date with me? 🫣
+</p>
+
+<p>
+Choose wisely... there is a suspicious button. 😂
+</p>
+
+<div class="buttons">
+
+<button class="primary" onclick="yesClicked()">
+YES 💕
+</button>
+
+<button id="noBtn">
+NO 🙃
+</button>
+
+</div>
+
+<p class="small">
+Don't worry, I'm just being dramatic. 😂
+</p>
+
+</div>
+
+
+<!-- STEP 2 -->
+
+<div id="step2" class="screen">
+
+<div class="progress">Step 1 of 3 💗</div>
+
+<div class="hero">🥹</div>
+
+<h1>Okayyyy, it's a date! 💕</h1>
+
+<p>
+Now let's plan our little adventure.
+</p>
+
+<label>📅 Pick a date</label>
+<input type="date" id="date">
+
+<label>⏰ Pick a time</label>
+<input type="time" id="time">
+
+<label>📍 Pick our place</label>
+
+<div class="location-grid">
+
+<div class="location" onclick="selectLocation(this,'Princep Ghat')">
+🌅<br>Princep Ghat
+</div>
+
+<div class="location" onclick="selectLocation(this,'Hooghly Boat Ride')">
+🚤<br>Hooghly Boat Ride
+</div>
+
+<div class="location" onclick="selectLocation(this,'Esplanade Walk')">
+✨<br>Esplanade Walk
+</div>
+
+<div class="location" onclick="selectLocation(this,'Princep Ghat + Street Food')">
+🌅🌮<br>Ghat + Street Food
+</div>
+
+<div class="location" onclick="selectLocation(this,'Victoria Memorial')">
+🌸<br>Victoria Memorial
+</div>
+
+<div class="location" onclick="selectLocation(this,'Maidan')">
+🌿<br>Maidan Walk
+</div>
+
+<div class="location" onclick="selectLocation(this,'Park Street')">
+🍝<br>Park Street
+</div>
+
+<div class="location" onclick="selectLocation(this,'College Street')">
+📚<br>College Street
+</div>
+
+<div class="location" onclick="selectLocation(this,'Eco Park')">
+🌳<br>Eco Park
+</div>
+
+<div class="location" onclick="selectLocation(this,'Rabindra Sarobar')">
+🌿<br>Rabindra Sarobar
+</div>
+
+<div class="location" onclick="selectLocation(this,'New Town')">
+🌆<br>New Town
+</div>
+
+<div class="location" onclick="selectLocation(this,'Kolkata Street Food Tour')">
+🌮<br>Street Food Tour
+</div>
+
+<div class="location" onclick="selectLocation(this,'Quest Mall')">
+🍰<br>Quest Mall
+</div>
+
+<div class="location" onclick="selectLocation(this,'South City Mall')">
+🎬<br>South City + Movie
+</div>
+
+<div class="location" onclick="selectLocation(this,'Nicco Park')">
+🎢<br>Nicco Park
+</div>
+
+<div class="location" onclick="selectLocation(this,'Surprise Me')">
+🎁<br>Surprise Me
+</div>
+
+</div>
+
+<div class="description" id="locationDescription">
+Pick somewhere and I'll describe the vibe. 💕
+</div>
+
+<button class="primary" onclick="goFood()">
+Next → Food 🍽️
+</button>
+
+</div>
+
+
+<!-- STEP 3 -->
+
+<div id="step3" class="screen">
+
+<div class="progress">Step 2 of 3 💗</div>
+
+<div class="hero">🍽️</div>
+
+<h1>Okay, important question...</h1>
+
+<p>
+What are we eating? 👀
+</p>
+
+<p class="small">
+Pick as many as you want.
+</p>
+
+<div class="food-grid">
+
+<div class="food" onclick="toggleFood(this,'Biryani')">
+<span class="food-icon">🍗</span>
+Biryani
+</div>
+
+<div class="food" onclick="toggleFood(this,'Momos')">
+<span class="food-icon">🥟</span>
+Momos
+</div>
+
+<div class="food" onclick="toggleFood(this,'Rolls')">
+<span class="food-icon">🌯</span>
+Kathi Roll
+</div>
+
+<div class="food" onclick="toggleFood(this,'Chowmein')">
+<span class="food-icon">🍜</span>
+Chowmein
+</div>
+
+<div class="food" onclick="toggleFood(this,'Pizza')">
+<span class="food-icon">🍕</span>
+Pizza
+</div>
+
+<div class="food" onclick="toggleFood(this,'Burger')">
+<span class="food-icon">🍔</span>
+Burger
+</div>
+
+<div class="food" onclick="toggleFood(this,'Puchka')">
+<span class="food-icon">🥣</span>
+Puchka
+</div>
+
+<div class="food" onclick="toggleFood(this,'Kathi Kebab')">
+<span class="food-icon">🍢</span>
+Kebab
+</div>
+
+<div class="food" onclick="toggleFood(this,'Dosa')">
+<span class="food-icon">🥞</span>
+Dosa
+</div>
+
+<div class="food" onclick="toggleFood(this,'Dessert')">
+<span class="food-icon">🍰</span>
+Dessert
+</div>
+
+</div>
+
+<br>
+
+<button class="primary" onclick="goLetter()">
+Next → 💌
+</button>
+
+</div>
+
+
+<!-- STEP 4 -->
+
+<div id="step4" class="screen">
+
+<div class="progress">Step 3 of 3 💗</div>
+
+<div class="hero">💐</div>
+
+<h1>A Little Note For You</h1>
+
+<div class="letter">
+
+<p>
+Hey you,
+</p>
+
+<p>
+I'm genuinely glad you said yes. 🥹💗
+</p>
+
+<p>
+I didn't want to make this another boring
+“so... where should we go?” conversation,
+so I made you this tiny little date planner instead. 😂
+</p>
+
+<p>
+Pick the day, choose the vibe, decide what
+we should eat — and then we'll just show up,
+forget the clock for a while, walk around,
+talk about random things and make a nice
+little memory together. 🌷
+</p>
+
+<p>
+No pressure to make it perfect.
+Honestly, the company matters more than
+the plan. 🫶🏻
+</p>
+
+<p>
+And if we end up walking around Esplanade
+for three hours talking about absolutely
+nothing... I'm counting that as a successful date. 😂💗
+</p>
+
+<p class="signature">
+— See you soon, maybe? 🌸
+</p>
+
+</div>
+
+<br>
+
+<button class="primary" onclick="submitDate()">
+SUBMIT OUR PLAN 💌
+</button>
+
+</div>
+
+
+<!-- SUCCESS -->
+
+<div id="success" class="screen">
+
+<div class="hero">🥰💐💗</div>
+
+<h1>DATE PLAN LOCKED! 🎀</h1>
+
+<p>
+Okay, it's officially happening. 😭
+</p>
+
+<div class="description" id="finalSummary"></div>
+
+<p>
+Glad you're coming along. 💗
+</p>
+
+<div style="font-size:30px;">
+🫶🏻 ✨ 🌸 💕 🌷 ✨ 🫶🏻
+</div>
+
+<p class="small">
+Now all that's left is showing up. 😌
+</p>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* DATA */
+
+let selectedLocation = "";
+let selectedFoods = [];
+
+
+/* LOCATION DESCRIPTIONS */
+
+const locationDescriptions = {
+
+"Princep Ghat":
+"Sunset, Hooghly river, walking, sitting by the ghat and talking for as long as we want. 🌅",
+
+"Hooghly Boat Ride":
+"River breeze, city views and a little boat adventure. 🚤",
+
+"Esplanade Walk":
+"Explore the heart of Kolkata, walk around, try street food and talk without rushing. ✨",
+
+"Princep Ghat + Street Food":
+"Walk by the Hooghly → sunset → sit and talk → Kolkata street food. Basically, a proper Kolkata date. 🌅🌮",
+
+"Victoria Memorial":
+"Beautiful surroundings, photos, walking and coffee afterwards. 🌸",
+
+"Maidan":
+"A relaxed evening walk with random conversations and city lights. 🌿",
+
+"Park Street":
+"Food, lights, dessert and a proper evening out. 🍝",
+
+"College Street":
+"Books, coffee and wandering around College Street. 📚☕",
+
+"Eco Park":
+"Long walk, greenery and plenty of time to talk. 🌳",
+
+"Rabindra Sarobar":
+"Peaceful lakeside walk and conversations that accidentally last for hours. 🌿",
+
+"New Town":
+"Explore New Town, grab food and enjoy the evening lights. 🌆",
+
+"Kolkata Street Food Tour":
+"Mission: try Kolkata snacks and decide who has better food opinions. 😂🌮",
+
+"Quest Mall":
+"Food, dessert, wandering around and maybe a movie. 🍰",
+
+"South City + Movie":
+"Movie + food + relaxed evening together. 🎬",
+
+"Nicco Park":
+"Rides, laughing and pretending neither of us is scared. 😂🎢",
+
+"Surprise Me":
+"You choose the adventure. I'm trusting you. 👀🎁"
+
+};
+
+
+/* SCREEN SWITCH */
+
+function showScreen(id){
+
+    document.querySelectorAll(".screen")
+        .forEach(screen => screen.classList.remove("active"));
+
+    document.getElementById(id)
+        .classList.add("active");
+
+}
+
+
+/* YES */
+
+function yesClicked(){
+
+    createDoodles(
+        window.innerWidth / 2,
+        window.innerHeight / 2
+    );
+
+    setTimeout(() => {
+        showScreen("step2");
+    },600);
+
+}
+
+
+/* RUNNING NO */
+
+const noBtn = document.getElementById("noBtn");
+const buttons = document.querySelector(".buttons");
+
+function escapeNo(){
+
+    const maxX =
+        buttons.clientWidth - noBtn.offsetWidth;
+
+    const maxY =
+        buttons.clientHeight - noBtn.offsetHeight;
+
+    noBtn.style.left =
+        Math.max(0,Math.random()*maxX) + "px";
+
+    noBtn.style.top =
+        Math.max(0,Math.random()*maxY) + "px";
+
+}
+
+noBtn.addEventListener("mouseenter",escapeNo);
+
+noBtn.addEventListener("touchstart",function(e){
+    e.preventDefault();
+    escapeNo();
+});
+
+
+/* LOCATION */
+
+function selectLocation(element,name){
+
+    document.querySelectorAll(".location")
+        .forEach(x => x.classList.remove("selected"));
+
+    element.classList.add("selected");
+
+    selectedLocation = name;
+
+    document.getElementById("locationDescription")
+        .innerText =
+        locationDescriptions[name];
+
+}
+
+
+/* FOOD */
+
+function toggleFood(element,name){
+
+    element.classList.toggle("selected");
+
+    if(selectedFoods.includes(name)){
+
+        selectedFoods =
+            selectedFoods.filter(food => food !== name);
+
+    }else{
+
+        selectedFoods.push(name);
+
+    }
+
+}
+
+
+/* NEXT FOOD */
+
+function goFood(){
+
+    const date =
+        document.getElementById("date").value;
+
+    const time =
+        document.getElementById("time").value;
+
+    if(!date || !time){
+
+        alert("Pick a date and time first 🥹💗");
+
+        return;
+    }
+
+    if(!selectedLocation){
+
+        alert("You forgot to choose where we're going 😭");
+
+        return;
+    }
+
+    showScreen("step3");
+
+}
+
+
+/* NEXT LETTER */
+
+function goLetter(){
+
+    if(selectedFoods.length === 0){
+
+        alert("At least choose one food 😂🍽️");
+
+        return;
+
+    }
+
+    createDoodles(
+        window.innerWidth/2,
+        window.innerHeight/2
+    );
+
+    setTimeout(() => {
+
+        showScreen("step4");
+
+    },500);
+
+}
+
+
+/* SUBMIT */
+
+function submitDate(){
+
+    const date =
+        document.getElementById("date").value;
+
+    const time =
+        document.getElementById("time").value;
+
+    const readableDate =
+        new Date(date+"T00:00:00")
+        .toLocaleDateString("en-IN",{
+            weekday:"long",
+            day:"numeric",
+            month:"long",
+            year:"numeric"
+        });
+
+    document.getElementById("finalSummary")
+        .innerHTML =
+
+        `
+        📅 <b>${readableDate}</b><br><br>
+
+        ⏰ <b>${time}</b><br><br>
+
+        📍 <b>${selectedLocation}</b><br><br>
+
+        🍽️ <b>${selectedFoods.join(", ")}</b>
+        `;
+
+    /*
+      IMPORTANT:
+      This currently displays the result locally.
+      To SEND the result to you, connect this function
+      to Formspree / Google Forms / your own backend.
+    */
+
+    showScreen("success");
+
+    createDoodles(
+        window.innerWidth/2,
+        window.innerHeight/2
+    );
+
+}
+
+
+/* DOODLES */
+
+function createDoodles(x,y){
+
+    const emojis=[
+        "💗","💕","💖","🌸","🎀",
+        "✨","🥹","🫶🏻","🌷",
+        "💐","🦋","⭐","💌"
+    ];
+
+    for(let i=0;i<30;i++){
+
+        const d =
+            document.createElement("div");
+
+        d.className="doodle";
+
+        d.innerText =
+            emojis[
+                Math.floor(
+                    Math.random()*emojis.length
+                )
+            ];
+
+        d.style.left =
+            (x+Math.random()*200-100)+"px";
+
+        d.style.top =
+            (y+Math.random()*100-50)+"px";
+
+        d.style.animationDuration =
+            (1.5+Math.random()*1.5)+"s";
+
+        document.body.appendChild(d);
+
+        setTimeout(()=>{
+            d.remove();
+        },3000);
+
+    }
+
+}
+
+</script>
+
+</body>
+</html>
